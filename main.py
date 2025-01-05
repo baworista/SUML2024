@@ -2,7 +2,11 @@ import os
 import numpy as np
 import pandas as pd
 import sklearn.metrics as metrics
+from sklearn.model_selection import train_test_split
+
 import data_fetcher
+from autogluon.tabular import TabularDataset, TabularPredictor
+
 
 # Define paths to training and test CSV files
 train_file_path = 'data/train.csv'
@@ -23,16 +27,58 @@ else:
 
 # Load the training and test datasets
 train_df = pd.read_csv(train_file_path)
-test_df = pd.read_csv(test_file_path)
 
 # Print basic information about the datasets
 print(train_df.head())
 print(train_df.info())
 
-# Split the training data into features and target variable
-X_train = train_df.iloc[:, 1:-2].values
-y_train = train_df.iloc[:, -1].values
+label_column = 'sii'  # Replace with the name of your label column
+if label_column in train_df.columns:
+    # Check for invalid values (NaN, Infinity, -Infinity)
+    invalid_values = train_df[~train_df[label_column].apply(np.isfinite)]  # Find invalid rows
+    if not invalid_values.empty:
+        print(f"Found invalid values in label column '{label_column}':")
+        print(invalid_values)
 
-# Print the training feature matrix and target vector
-print(X_train)
-print(y_train)
+    # Drop rows with invalid values
+    train_df = train_df[train_df[label_column].apply(np.isfinite)]
+# Готовим данные для AutoGluon: создаем датасеты
+# В данном примере предположим, что колонка 'target' является целевой переменной
+label_column = 'sii'  # Замените на имя вашей целевой переменной
+train_data, test_data = train_test_split(train_df, test_size=0.2, random_state=42)
+
+train_data = TabularDataset(train_data)
+test_data = TabularDataset(test_data)
+
+
+# Обучаем модели с использованием AutoGluon
+print("Training models using AutoGluon...")
+# model_save_path = 'saved_models/ag_model'
+#
+# predictor = TabularPredictor(label=label_column, eval_metric='accuracy',path=model_save_path).fit(train_data, time_limit=60, presets='best_quality', keep_only_best=True)  # time_limit=60 ограничивает время обучения 60 секундами
+#
+# # Сохраняем лучшую обученную модель
+# predictor.save(model_save_path)
+# print(f"Model saved to {model_save_path}")
+#
+# # Можно позже загрузить модель через:
+# print(test_data)
+predictor = TabularPredictor.load('saved_models/ag_model')
+
+
+
+
+
+# Предикт для тестовых данных
+if 'sii' in test_data.columns:  # Если в тестовых данных есть целевая переменная
+    test_predictions = predictor.predict(test_data)
+    print("Test Predictions:")
+    print(test_predictions)
+else:
+    print("No target found in test dataset. Predictions skipped.")
+
+# Вывод метрик (если известны истинные значения на тестовых данных)
+if 'sii' in test_data.columns:
+    test_labels = test_data[label_column]
+    accuracy = predictor.evaluate_predictions(y_true=test_labels, y_pred=test_predictions)
+    print(f"Test Accuracy: {accuracy}")
