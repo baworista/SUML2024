@@ -6,7 +6,7 @@ autogluon.multimodal==1.2
 autogluon.tabular==1.2
 autogluon.timeseries==1.2
 kaggle==1.6.17
-numpy==2.2.1
+numpy>=1.25.0,<2.1.4
 pandas==2.2.3
-scikit_learn==1.6.0
+scikit-learn>=1.4.0,<1.5.3
 streamlit==1.41.1
