@@ -1,5 +1,12 @@
-numpy
-pandas
-scikit-learn
-kaggle
-fastparquet
+autogluon==1.2
+autogluon.common==1.2.1b20250105
+autogluon.core==1.2.1b20250105
+autogluon.features==1.2.1b20250105
+autogluon.multimodal==1.2.1b20250105
+autogluon.tabular==1.2.1b20250105
+autogluon.timeseries==1.2
+kaggle==1.6.17
+numpy==2.2.1
+pandas==2.2.3
+scikit_learn==1.6.0
+streamlit==1.41.1
