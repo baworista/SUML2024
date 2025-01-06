@@ -5,7 +5,7 @@ import io  # Для обработки CSV-строки как файла
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
 
 # Paths to the saved model
-MODEL_PATH = "/saved_models/ag_model"
+MODEL_PATH = "saved_models/ag_model"
 
 
 # Load the model
